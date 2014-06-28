@@ -1,0 +1,15 @@
+{
+    "text": "# Quests",
+    "attribute": "str",
+    "priority": 1,
+    "value": 0,
+    "notes": "",
+    "dateCreated": "2014-06-27T18:22:05.834Z",
+    "id": "bc8b8c0b-66d4-49bc-9864-5d71aabac136",
+    "down": false,
+    "up": false,
+    "history": [
+    ],
+    "type": "habit"
+}
+

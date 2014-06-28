@@ -3,6 +3,8 @@ HabitRPG viewer
 
 Fetch [HabitRPG][] information as a command line tool.
 
+See <https://habitrpg.com/static/api#!/> for API.
+
 [HabitRPG]: http://habitrpg.com/ "HabitRPG"
 
 Setup
@@ -31,4 +33,9 @@ Needs
 9. Take rewards
 10. Dailies done stats
 11. Todos done today/this week stats
+
+TODO
+====
+
+1. Impl for json Decodable, use Decoder to fetch info.
 
