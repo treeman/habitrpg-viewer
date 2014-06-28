@@ -1,3 +1,5 @@
+#![feature(struct_variant)]
+
 #![feature(globs)]
 #![feature(macro_rules)]
 
@@ -12,9 +14,11 @@ extern crate core;
 
 use conn::get;
 use id::Id;
-use tasks::*;
 use std::io::File;
 use serialize::{json, Decodable};
+
+use tasks::task::Task;
+//use tasks::habit::Habit;
 
 mod conn;
 mod id;
@@ -41,12 +45,12 @@ fn main() {
     };
     println!("Have: {}", json_object.to_pretty_str());
     let mut decoder = json::Decoder::new(json_object);
-    let task: Task = match Decodable::decode(&mut decoder) {
+    let tasks: Vec<Task> = match Decodable::decode(&mut decoder) {
         Ok(v) => v,
         Err(e) => fail!("Decoding error: {}", e)
     };
 
     println!("Found in tasks.json");
-    println!("{}", task);
+    println!("{}", tasks);
 }
 
