@@ -65,6 +65,56 @@ fn get(url: &str, id: &Id) -> String {
     out
 }
 
+#[deriving(Decodable)]
+pub struct HistVal  {
+    value: float,
+    date: String, // Date
+}
+
+#[deriving(Decodable)]
+pub struct CheckItem  {
+    text: String,
+    id: String, // Id?
+    completed: bool,
+}
+
+#[deriving(Decodable)]
+pub struct Repeat  {
+    su: bool,
+    s: bool,
+    f: bool,
+    th: bool,
+    w: bool,
+    t: bool,
+    m: bool
+}
+
+#[deriving(Decodable)]
+pub struct Tags  {
+    // List of id: bool
+}
+
+
+#[deriving(Decodable)]
+pub struct Task  {
+    text: String,
+    attribute: String, // "str" wut?
+    priority: float,
+    value: float,
+    notes: String,
+    dateCreated: String, // "2014-06-27T18:22:05.834Z", can decode
+    down: bool,
+    up: bool,
+    history: Vec<HistVal>,
+    type: String, // "habit", "reward", "daily", "todo"
+    tags: Tags,
+
+    completed: bool, // dailies
+    streak: uint,
+    checklist: Vec<CheckItem>,
+    repeat: Repeat,
+}
+
 fn main() {
     let id = Id::from_file(&Path::new("id.json"));
     println!("Registering with");
