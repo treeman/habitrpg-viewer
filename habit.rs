@@ -12,15 +12,21 @@ extern crate regex;
 
 extern crate serialize;
 extern crate core;
+extern crate time;
 
 use std::io::File;
 use serialize::{json, Decodable};
 use core::fmt::{Show};
+use time::now;
+use std::os;
+use std::io;
+use std::io::fs;
 
 //use api::conn::get;
 use api::id::Id;
 //use api::task::*;
 use api::user::*;
+use api::request::*;
 
 mod api;
 
@@ -55,11 +61,47 @@ fn parse_user(_: &Id) -> User {
     user
 }
 
+fn create_dir(dir: &Path) {
+    if dir.is_file() {
+        fail!("dir: {} is a file, aborting.", dir.display());
+    }
+    if !dir.is_dir() {
+        println!("Creating dir: {}", dir.display());
+        match fs::mkdir(dir, io::UserRWX) {
+            Ok(_) => (),
+            Err(e) => fail!("Failed to create dir: {}", e),
+        };
+    }
+}
+
 fn main() {
+    let homedir = match os::homedir() {
+        Some(d) => d,
+        None => fail!("Could not find your homedir!"),
+    };
+    //println!("Your homedir is: {}", homedir.display());
+
+    // TODO make it lazy!
+    let configdir = homedir.join(".habitrpg-viewer");
+    println!("Config dir: {}", configdir.display());
+    create_dir(&configdir);
+
+    let cachedir = configdir.join("cache");
+    create_dir(&cachedir);
+
     let id = Id::from_file(&Path::new("id.json"));
     println!("Registering with");
     println!("  api_token: {}", id.api_token);
     println!("  user_id: {}", id.user_id);
+
+    // Lazy fetching of urls.
+    let r = fetch(Party, &cachedir, &id);
+    println!("Got: {}", r);
+
+    //if shall_update(&Path::new("habit")) {
+        //println!("Yup");
+    //}
+    return;
 
     let user = parse_user(&id);
 
