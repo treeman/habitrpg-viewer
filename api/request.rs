@@ -1,8 +1,5 @@
 use std::io::File;
 use time::now;
-use std::os;
-use std::io;
-use std::io::fs;
 
 use api::id::Id;
 use api::conn::get;
@@ -39,21 +36,24 @@ impl Request {
 
 pub fn fetch(req: Request, cachedir: &Path, id: &Id) -> String {
     let cache_file = cachedir.join(req.to_string());
-    println!("Checking {}", cache_file.display());
+    //println!("Checking {}", cache_file.display());
     if shall_update(&cache_file) {
-        println!("Sending request to: {}", req.url());
+        //println!("Sending request to: {}", req.url());
 
         let content = get(req.url().as_slice(), id);
         let mut f = match File::create(&cache_file) {
             Ok(f) => f,
             Err(e) => fail!("Couldn't create {}: {}", cache_file.display(), e),
         };
-        println!("Updating cache for {} ({})", req.url(), cache_file.display());
-        f.write_str(content.as_slice());
+        //println!("Updating cache for {} ({})", req.url(), cache_file.display());
+        match f.write_str(content.as_slice()) {
+            Err(e) => fail!("Write failed: {}", e),
+            _ => (),
+        };
         content.to_string()
     }
     else {
-        println!("Reading from cache {} ({})", req.url(), cache_file.display());
+        //println!("Reading from cache {} ({})", req.url(), cache_file.display());
         match File::open(&cache_file).read_to_str() {
             Ok(s) => s,
             Err(e) => fail!("Failed to read {}: {}", cache_file.display(), e),
@@ -80,8 +80,8 @@ fn minutes_since_modify(path: &Path) -> Option<f32> {
 fn shall_update(path: &Path) -> bool {
     match minutes_since_modify(path) {
         Some(min) => {
-            println!("{} minutes since modify", min);
-            min > 5.0
+            //println!("{} minutes since modify", min);
+            min > 10.0
         },
         None => true,
     }

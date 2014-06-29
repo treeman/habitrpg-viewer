@@ -2,15 +2,15 @@ use api::date::Date;
 
 #[deriving(Show, Encodable, Decodable)]
 pub struct Habit {
-    text: String,
+    pub text: String,
     //attribute: String, // "str" wut?
-    priority: f32,
-    value: f32,
-    notes: String,
-    dateCreated: Date, // "2014-06-27T18:22:05.834Z", can decode
-    id: String,
-    down: bool,
-    up: bool,
+    pub priority: f32,
+    pub value: f32,
+    pub notes: String,
+    pub dateCreated: Date, // "2014-06-27T18:22:05.834Z", can decode
+    pub id: String,
+    pub down: bool,
+    pub up: bool,
     //history: Vec<String>, // TODO
 }
 

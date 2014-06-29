@@ -13,14 +13,14 @@ extern crate regex;
 extern crate serialize;
 extern crate core;
 extern crate time;
+extern crate getopts;
 
-use std::io::File;
-use serialize::{json, Decodable};
+use getopts::*;
 use core::fmt::{Show};
-use time::now;
 use std::os;
 use std::io;
 use std::io::fs;
+use std::io::stdio::{print, println};
 
 //use api::conn::get;
 use api::id::Id;
@@ -36,31 +36,8 @@ fn print<T:Show>(tasks: Vec<T>) {
     }
 }
 
-fn parse_user(_: &Id) -> User {
-    let s = match File::open(&Path::new("data/user")).read_to_str() {
-        Ok(v) => v,
-        Err(e) => fail!("Failed to read: {}", e)
-    };
-
-    //let s = get("https://beta.habitrpg.com/api/v2/user", id);
-    let obj = match json::from_str(s.as_slice()) {
-        Ok(v) => v,
-        Err(e) => fail!("json parse error: {}", e)
-    };
-    //println!("{}", obj.to_pretty_str());
-
-    let mut decoder = json::Decoder::new(obj.clone());
-    let user: User = match Decodable::decode(&mut decoder) {
-        Ok(v) => v,
-        Err(e) => fail!("Decoding error: {}", e)
-    };
-
-    //println!("User");
-    //println!("{}", user);
-
-    user
-}
-
+// TODO recursive?
+// Also create dir for file
 fn create_dir(dir: &Path) {
     if dir.is_file() {
         fail!("dir: {} is a file, aborting.", dir.display());
@@ -74,83 +51,155 @@ fn create_dir(dir: &Path) {
     }
 }
 
+struct Env {
+    configdir: Path,
+    cachedir: Path,
+    id: Id,
+}
+
+impl Env {
+    pub fn new() -> Env {
+        let homedir = match os::homedir() {
+            Some(d) => d,
+            None => fail!("Could not find your homedir!"),
+        };
+
+        // TODO lazy?
+        let configdir = homedir.join(".habitrpg-viewer");
+        create_dir(&configdir);
+
+        let cachedir = configdir.join("cache");
+        create_dir(&cachedir);
+
+        let id = Id::from_file(&configdir.join("id.json"));
+
+        Env {
+            configdir: configdir,
+            cachedir: cachedir,
+            id: id,
+        }
+    }
+}
+
+fn help(opts: &[OptGroup]) {
+    let usage = usage("Command line interface to fetch information from habitrpg", opts);
+    println!("{}", usage);
+}
+
 fn main() {
-    let homedir = match os::homedir() {
-        Some(d) => d,
-        None => fail!("Could not find your homedir!"),
-    };
     //println!("Your homedir is: {}", homedir.display());
+    let args: Vec<String> = os::args().iter()
+                                      .map(|x| x.to_string())
+                                      .collect();
 
-    // TODO make it lazy!
-    let configdir = homedir.join(".habitrpg-viewer");
-    println!("Config dir: {}", configdir.display());
-    create_dir(&configdir);
+    let opts = [
+        optflag("h", "help", "Print this"),
+        optflag("", "todos", "Output unfinished todos"),
+        optflag("", "dailys", "Output dailys"),
+        optflag("", "habits", "Output habits"),
+        optflag("v", "verbose", "Verbose output"),
+        optflag("d", "debug", "Debug"),
+        optflag("", "conky", "Add format specifiers for conky display. Harr."),
+    ];
 
-    let cachedir = configdir.join("cache");
-    create_dir(&cachedir);
+    let args = match getopts(args.tail(), opts) {
+        Ok(m) => m,
+        Err(e) => fail!("Failed to get args: {}", e),
+    };
 
-    let id = Id::from_file(&Path::new("id.json"));
-    println!("Registering with");
-    println!("  api_token: {}", id.api_token);
-    println!("  user_id: {}", id.user_id);
+    if args.opt_present("h") {
+        help(opts);
+        return;
+    }
 
-    // Lazy fetching of urls.
-    let r = fetch(Party, &cachedir, &id);
-    println!("Got: {}", r);
+    // TODO debug/verbose flags to control output!
+    //let debug = args.opt_present("debug");
+    let verbose = args.opt_present("verbose");
+    let conky = args.opt_present("conky");
 
-    //if shall_update(&Path::new("habit")) {
-        //println!("Yup");
-    //}
-    return;
+    let env = Env::new();
 
-    let user = parse_user(&id);
+    if verbose {
+        //println!("Config dir: {}", configdir.display());
+        println!("Registering with");
+        println!("  api_token: {}", env.id.api_token);
+        println!("  user_id: {}", env.id.user_id);
+    }
 
-    println!("Found user: {}", user.profile.name);
-    println!("  {:u} habits", user.habits.len());
-    println!("  {:u} dailys", user.dailys.len());
-    println!("  {:u} todos", user.todos.len());
+    let user = User::fetch(&env.cachedir, &env.id);
 
-    println!("level {:u} {:s}", user.stats.lvl, user.stats.class);
-    println!("   {:u}/{:u} hp", user.stats.hp, user.stats.maxHealth);
-    println!("   {:u}/{:u} mp", user.stats.mp, user.stats.maxMP);
-    println!("   {:f}/{:f} xp", user.stats.exp, user.stats.toNextLevel);
-
-    //println!("Habits");
-    //print(user.habits);
-    println!("\nDailys\n-------");
-    // TODO better filtering.
-    for t in user.dailys.iter() {
-        if !t.text.as_slice().starts_with("#") {
+    if args.opt_present("todos") {
+        for t in user.unfinished_todos().iter() {
+            if conky {
+                print!("${{voffset 8}}");
+            }
             println!("{}", t);
         }
     }
-    println!("\nTodos\n-----");
-    // TODO better filtering
-    for t in user.todos.iter() {
-        if !t.completed {
+    else if args.opt_present("dailys") {
+        for t in user.dailys().iter() {
+            if conky {
+                print!("${{voffset 8}}");
+            }
             println!("{}", t);
         }
     }
-    //println!("Rewards");
-    //print(user.rewards);
+    else if args.opt_present("habits") {
+        for t in user.habits().iter() {
+            if conky {
+                print!("${{voffset 8}}");
+            }
+            println!("{}", t);
+        }
+    }
+    else {
 
-    //println!("Server status: {}", get("https://beta.habitrpg.com/api/v2/status", &id));
+        user.print_char();
+        user.print_char_stats();
+        println!("Tasks");
+        user.print_task_stats();
 
-    //let s = get("https://beta.habitrpg.com/api/v2/groups/party", &id);
-    ////println!("Have {}", s);
-    //let obj = match json::from_str(s.as_slice()) {
-        //Ok(v) => v,
-        //Err(e) => fail!("json parse error: {}", e)
-    //};
-    //println!("{}", obj.to_pretty_str());
+        //println!("Found user: {}", user.profile.name);
+        //println!("  {:u} habits", user.habits.len());
+        //println!("  {:u} dailys", user.dailys.len());
+        //println!("  {:u} todos", user.todos.len());
 
-    //let mut decoder = json::Decoder::new(json_object);
-    //let tasks: Vec<Task> = match Decodable::decode(&mut decoder) {
-        //Ok(v) => v,
-        //Err(e) => fail!("Decoding error: {}", e)
-    //};
+        //println!("level {:u} {:s}", user.stats.lvl, user.stats.class);
+        //println!("   {:u}/{:u} hp", user.stats.hp, user.stats.maxHealth);
+        //println!("   {:u}/{:u} mp", user.stats.mp, user.stats.maxMP);
+        //println!("   {:f}/{:f} xp", user.stats.exp, user.stats.toNextLevel);
 
-    //println!("Found in tasks.json");
-    //println!("{}", tasks);
+        //println!("Habits");
+        //print(user.habits);
+        println!("\nDailys\n-------");
+        for t in user.dailys().iter() {
+            println!("{}", t);
+        }
+        println!("\nTodos\n-----");
+        for t in user.unfinished_todos().iter() {
+            println!("{}", t);
+        }
+        //println!("Rewards");
+        //print(user.rewards);
+
+        //println!("Server status: {}", get("https://beta.habitrpg.com/api/v2/status", &id));
+
+        //let s = get("https://beta.habitrpg.com/api/v2/groups/party", &id);
+        ////println!("Have {}", s);
+        //let obj = match json::from_str(s.as_slice()) {
+            //Ok(v) => v,
+            //Err(e) => fail!("json parse error: {}", e)
+        //};
+        //println!("{}", obj.to_pretty_str());
+
+        //let mut decoder = json::Decoder::new(json_object);
+        //let tasks: Vec<Task> = match Decodable::decode(&mut decoder) {
+            //Ok(v) => v,
+            //Err(e) => fail!("Decoding error: {}", e)
+        //};
+
+        //println!("Found in tasks.json");
+        //println!("{}", tasks);
+    }
 }
 
