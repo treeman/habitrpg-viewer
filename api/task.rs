@@ -5,6 +5,16 @@ use std::fmt::FormatError;
 
 use api::date::Date;
 
+// TODO what for?
+#[deriving(Show, Encodable, Decodable)]
+pub enum Attribute {
+    Strength,
+    Constituion,
+    Intelligence,
+    Perception,
+}
+
+
 #[deriving(Show, Encodable)]
 pub enum TaskType {
     HabitType,

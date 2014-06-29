@@ -1,7 +1,6 @@
-use core::fmt::{Show, Formatter};
+use core::fmt::{Show, Formatter, FormatError};
 use serialize::{Encodable, Decodable, Decoder, Encoder};
 use std::result::Result;
-use std::fmt::FormatError;
 
 
 // For now just parse 2014-06-27T18:22:05.834Z
