@@ -38,8 +38,8 @@ Needs
 TODO
 ====
 
-1. Separate Task into different types.
-1. Restructure parsing handling to final structure.
+1. Filter/Mark dark dailys
+1. Colorize print conky?
 1. Party parsing for boss battle and for friends.
 1. Pretty printing for all the things! Especially user objects and the new tasks.
 2. cmdline args for selective printing.
