@@ -52,6 +52,14 @@
     },
     "completed": false,
     "history": [
+      {
+        "value": 1,
+        "date": 1403636682010
+      },
+      {
+        "value": 3.9662579827563,
+        "date": 1403900322394
+      }
     ],
     "type": "daily"
   },

@@ -1,5 +1,5 @@
-use core::fmt::{Show, Formatter, Result};
-use serialize::{json, Encodable, Decodable, Decoder, Encoder};
+use core::fmt::{Show, Formatter};
+use serialize::{Encodable, Decodable, Decoder, Encoder};
 use std::result::Result;
 use std::fmt::FormatError;
 
@@ -21,7 +21,7 @@ impl Date {
     pub fn from_str(s: &str) -> Option<Date> {
         let re = regex!(r"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})\.(\d{3})Z");
         let caps = re.captures(s);
-        caps.and_then(|x| {
+        let res = caps.and_then(|x| {
             Some(Date {
                 year: from_str(x.at(1)).unwrap(),
                 month: from_str(x.at(2)).unwrap(),
@@ -31,7 +31,8 @@ impl Date {
                 sec: from_str(x.at(6)).unwrap(),
                 ms: from_str(x.at(7)).unwrap(),
             })
-        })
+        });
+        res
     }
 
     pub fn to_string(&self) -> String {

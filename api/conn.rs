@@ -1,7 +1,7 @@
 use std::io::process::Command;
 use std::str;
 
-use id::Id;
+use api::id::Id;
 
 // Wrap GET requests and use curl.
 // Did not find a stable library for it.

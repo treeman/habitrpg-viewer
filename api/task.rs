@@ -1,14 +1,9 @@
-use core::fmt::{Show, Formatter, Result};
-use serialize::{json, Encodable, Decodable, Decoder, Encoder};
+use core::fmt::{Show, Formatter};
+use serialize::{Encodable, Decodable, Decoder, Encoder};
 use std::result::Result;
 use std::fmt::FormatError;
 
-use tasks::date::Date;
-
-//#[deriving(Decodable)]
-//pub struct Tags  {
-    //// List of id: bool
-//}
+use api::date::Date;
 
 #[deriving(Show, Encodable)]
 pub enum TaskType {
@@ -20,7 +15,10 @@ pub enum TaskType {
 
 impl<E, D:Decoder<E>> Decodable<D, E> for TaskType {
     fn decode(d: &mut D) -> Result<TaskType, E> {
-        let x = d.read_str().ok().unwrap();
+        let x = match d.read_str() {
+            Ok(x) => x,
+            Err(_) => fail!("Failed to read task type"),
+        };
         match x.as_slice() {
             "habit" => Ok(HabitType),
             "daily" => Ok(DailyType),
@@ -31,11 +29,11 @@ impl<E, D:Decoder<E>> Decodable<D, E> for TaskType {
     }
 }
 
-#[deriving(Show, Encodable)]
+#[deriving(Encodable)]
 pub enum Task {
     Habit {
         text: String,
-        attribute: String, // "str" wut?
+        //attribute: String, // "str" wut?
         priority: f32,
         value: f32,
         notes: String,
@@ -43,12 +41,12 @@ pub enum Task {
         id: String,
         down: bool,
         up: bool,
-        history: Vec<String>, // TODO
+        //history: Vec<String>, // TODO
     },
 
     Daily {
         text: String,
-        attribute: String, // "str" wut?
+        //attribute: String, // "str" Some value...
         priority: f32,
         value: f32,
         notes: String,
@@ -59,12 +57,12 @@ pub enum Task {
         // collapseChecklist
         // repeat
         completed: bool,
-        history: Vec<String>, // TODO
+        //history: Vec<String>, // TODO
     },
 
     Todo {
         text: String,
-        attribute: String, // "str" wut?
+        //attribute: String, // "str" wut?
         priority: f32,
         value: f32,
         notes: String,
@@ -73,41 +71,20 @@ pub enum Task {
         // checklist
         // collapseChecklist
         completed: bool,
+        // archived: bool,
+        // dateCompleted: Date,
+        // challenge?
     },
 
     Reward {
         text: String,
-        attribute: String, // "str" wut?
+        //attribute: String, // "str" wut?
         priority: f32,
-        value: f32,
+        cost: f32,
         notes: String,
         dateCreated: Date, // "2014-06-27T18:22:05.834Z", can decode
         id: String,
     },
-}
-
-fn require<E, D:Decoder<E>, T:Decodable<D, E>>(d: &mut D, field: &str) -> T {
-    match d.read_struct_field(field, 0, |d: &mut D| {
-            // Also possible: d.read_uint()
-            // etc. But this is general for all Decodables!
-            Decodable::decode(d)
-        })
-    {
-        Ok(s) => s,
-        Err(e) => fail!("Failed to decode field: {}", field),
-    }
-}
-
-fn default<E, D:Decoder<E>, T:Decodable<D, E>>(d: &mut D, field: &str, default: T) -> T {
-    match d.read_struct_field(field, 0, |d: &mut D| {
-            // Also possible: d.read_uint()
-            // etc. But this is general for all Decodables!
-            Decodable::decode(d)
-        })
-    {
-        Ok(s) => s,
-        Err(e) => default,
-    }
 }
 
 impl<E, D:Decoder<E>> Decodable<D, E> for Task {
@@ -119,7 +96,6 @@ impl<E, D:Decoder<E>> Decodable<D, E> for Task {
                     HabitType =>
                         Ok(Habit {
                             text: require(d, "text"),
-                            attribute: require(d, "attribute"),
                             priority: require(d, "priority"),
                             value: require(d, "value"),
                             notes: require(d, "notes"),
@@ -127,12 +103,10 @@ impl<E, D:Decoder<E>> Decodable<D, E> for Task {
                             id: require(d, "id"),
                             down: require(d, "down"),
                             up: require(d, "up"),
-                            history: require(d, "history"),
                         }),
                     DailyType =>
                         Ok(Daily {
                             text: require(d, "text"),
-                            attribute: require(d, "attribute"),
                             priority: require(d, "priority"),
                             value: require(d, "value"),
                             notes: require(d, "notes"),
@@ -140,25 +114,39 @@ impl<E, D:Decoder<E>> Decodable<D, E> for Task {
                             id: require(d, "id"),
                             streak: require(d, "streak"),
                             completed: require(d, "completed"),
-                            history: require(d, "history"),
                         }),
                     TodoType =>
                         Ok(Todo {
                             text: require(d, "text"),
-                            attribute: require(d, "attribute"),
                             priority: require(d, "priority"),
                             value: require(d, "value"),
                             notes: require(d, "notes"),
                             dateCreated: require(d, "dateCreated"),
                             id: require(d, "id"),
                             completed: require(d, "completed"),
+                            //archived: require(d, "archived"),
+                            //archived: false,
+                            //archived: {
+                                ////let res = default(d, "archived", false);
+                                //let res = match d.read_struct_field("archived", 0, |d: &mut D| {
+                                        //// Also possible: d.read_uint()
+                                        //// etc. But this is general for all Decodables!
+                                        ////Decodable::decode(d)
+                                        //d.read_bool()
+                                    //})
+                                //{
+                                    //Ok(s) => s,
+                                    //Err(e) => false,
+                                //};
+                                //println!("archived = {}", res);
+                                //false
+                            //}
                         }),
                     RewardType =>
                         Ok(Reward {
                             text: require(d, "text"),
-                            attribute: require(d, "attribute"),
                             priority: require(d, "priority"),
-                            value: require(d, "value"),
+                            cost: require(d, "value"),
                             notes: require(d, "notes"),
                             dateCreated: require(d, "dateCreated"),
                             id: require(d, "id"),
@@ -166,6 +154,69 @@ impl<E, D:Decoder<E>> Decodable<D, E> for Task {
                 }
             }
         )
+    }
+}
+
+impl Show for Task {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
+        match self {
+            &Habit {
+                text: ref text,
+                ..
+            } => {
+                write!(f, "Habit: {}", text)
+            },
+            &Daily {
+                text: ref text,
+                ..
+            } => {
+                write!(f, "Daily: {}", text)
+            },
+            &Todo {
+                text: ref text,
+                ..
+            } => {
+                write!(f, "Todo: {}", text)
+            },
+            &Reward {
+                text: ref text,
+                ..
+            } => {
+                write!(f, "Reward: {}", text)
+            },
+        }
+        //write!(f, "prefix: {} code: {} param: {}",
+               //self.prefix, self.code, self.param)
+    }
+}
+
+fn require<E, D:Decoder<E>, T:Decodable<D, E>>(d: &mut D, field: &str) -> T {
+    match d.read_struct_field(field, 0, |d: &mut D| {
+            // Also possible: d.read_uint()
+            // etc. But this is general for all Decodables!
+            Decodable::decode(d)
+        })
+    {
+        Ok(s) => s,
+        Err(_) => fail!("Failed to decode field: {}", field),
+    }
+}
+
+fn default<E, D:Decoder<E>, T:Decodable<D, E>>(d: &mut D, field: &str, default: T) -> T {
+    match d.read_struct_field(field, 0, |d: &mut D| {
+            // Also possible: d.read_uint()
+            // etc. But this is general for all Decodables!
+            Decodable::decode(d)
+        })
+    {
+        Ok(s) => {
+            println!("Found {}", field);
+            s
+        },
+        Err(_) => {
+            println!("Did not find {}", field);
+            default
+        },
     }
 }
 
