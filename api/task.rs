@@ -29,6 +29,8 @@ impl<E, D:Decoder<E>> Decodable<D, E> for TaskType {
     }
 }
 
+// TODO remove enum struct types,
+// make Habit, Daily, Todo, Reward classes instead!
 #[deriving(Encodable)]
 pub enum Task {
     Habit {

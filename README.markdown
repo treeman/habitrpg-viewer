@@ -22,8 +22,9 @@ Create `id.json` with
 Needs
 -----
 
-1. Unmarked dailies
-2. To-Dos
+1. Unmarked dailies (+ # Done today)
+2. Unfinished To-Dos (+ # Done today)
+2. Habits (+ # Done today)
 3. Sort by tags
 4. Fetch todo due dates
 5. Profile info (life, xp)
@@ -37,5 +38,9 @@ Needs
 TODO
 ====
 
-1. Impl for json Decodable, use Decoder to fetch info.
+1. Separate Task into different types.
+1. Restructure parsing handling to final structure.
+1. Party parsing for boss battle and for friends.
+1. Pretty printing for all the things! Especially user objects and the new tasks.
+2. cmdline args for selective printing.
 

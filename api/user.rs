@@ -1,3 +1,5 @@
+// TODO cleanup!
+//
 //use core::fmt::{Show, Formatter};
 //use serialize::{Encodable, Decodable, Decoder, Encoder};
 use serialize::{Encodable, Decoder, Encoder};
@@ -39,6 +41,7 @@ pub struct Items {
     // special ?
 }
 
+// TODO move
 #[deriving(Show, Encodable, Decodable)]
 pub struct Quest {
     // completed: "null" wut?
@@ -46,12 +49,14 @@ pub struct Quest {
     // progess?
 }
 
+// TODO should parse from other place?
 #[deriving(Show, Encodable, Decodable)]
 pub struct Party {
     // ordering
     pub quest: Quest,
 }
 
+// TODO what for?
 #[deriving(Show, Encodable, Decodable)]
 pub enum Attribute {
     Strength,
@@ -71,14 +76,15 @@ pub enum Attribute {
     //// streaks: bool ?
 //}
 
+// TODO custom Show
 #[deriving(Show, Encodable, Decodable)]
 pub struct Stats {
     //buffs: Buffs,
     pub class: String, // Or class...
-    //constitution: uint,
-    //intelligence: uint,
-    //perception: uint,
-    //strength: uint,
+    pub con: uint,
+    pub int: uint,
+    pub per: uint,
+    pub str: uint,
     pub exp: f32,
     pub gp: f32,
     pub hp: uint,
@@ -103,6 +109,7 @@ pub struct Profile {
     pub name: String,
 }
 
+// TODO custom Show
 #[deriving(Show, Encodable, Decodable)]
 pub struct User {
     pub achievements: Achievements,
@@ -123,6 +130,6 @@ pub struct User {
     // profile (name...)
     pub profile: Profile,
     pub stats: Stats,
-    pub tags: Vec<Tag>,
+    pub tags: Vec<Tag>, // TODO dictionary
 }
 
