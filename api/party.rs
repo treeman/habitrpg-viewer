@@ -4,6 +4,6 @@ use api::quest::*;
 #[deriving(Show, Encodable, Decodable)]
 pub struct Party {
     // ordering
-    pub quest: Quest,
+    pub quest: Quest, // TODO should be optional!
 }
 

@@ -20,7 +20,7 @@ use core::fmt::{Show};
 use std::os;
 use std::io;
 use std::io::fs;
-use std::io::stdio::{print, println};
+//use std::io::stdio::{print, println};
 
 //use api::conn::get;
 use api::id::Id;
@@ -159,18 +159,6 @@ fn main() {
         println!("Tasks");
         user.print_task_stats();
 
-        //println!("Found user: {}", user.profile.name);
-        //println!("  {:u} habits", user.habits.len());
-        //println!("  {:u} dailys", user.dailys.len());
-        //println!("  {:u} todos", user.todos.len());
-
-        //println!("level {:u} {:s}", user.stats.lvl, user.stats.class);
-        //println!("   {:u}/{:u} hp", user.stats.hp, user.stats.maxHealth);
-        //println!("   {:u}/{:u} mp", user.stats.mp, user.stats.maxMP);
-        //println!("   {:f}/{:f} xp", user.stats.exp, user.stats.toNextLevel);
-
-        //println!("Habits");
-        //print(user.habits);
         println!("\nDailys\n-------");
         for t in user.dailys().iter() {
             println!("{}", t);
@@ -179,27 +167,6 @@ fn main() {
         for t in user.unfinished_todos().iter() {
             println!("{}", t);
         }
-        //println!("Rewards");
-        //print(user.rewards);
-
-        //println!("Server status: {}", get("https://beta.habitrpg.com/api/v2/status", &id));
-
-        //let s = get("https://beta.habitrpg.com/api/v2/groups/party", &id);
-        ////println!("Have {}", s);
-        //let obj = match json::from_str(s.as_slice()) {
-            //Ok(v) => v,
-            //Err(e) => fail!("json parse error: {}", e)
-        //};
-        //println!("{}", obj.to_pretty_str());
-
-        //let mut decoder = json::Decoder::new(json_object);
-        //let tasks: Vec<Task> = match Decodable::decode(&mut decoder) {
-            //Ok(v) => v,
-            //Err(e) => fail!("Decoding error: {}", e)
-        //};
-
-        //println!("Found in tasks.json");
-        //println!("{}", tasks);
     }
 }
 

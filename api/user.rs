@@ -7,7 +7,7 @@ use serialize::{Encodable, Decoder, Decodable, Encoder, json};
 
 use api::date::*;
 use api::achievements::*;
-use api::party::*;
+//use api::party::*;
 use api::stats::*;
 use api::tag::*;
 use api::habit::*;
@@ -45,10 +45,10 @@ pub struct User {
     // history exp/todo
     pub id: String,
     // invitations
-    pub items: Items,
+    //pub items: Items,
     pub lastCron: Date,
     // newMessages ?
-    pub party: Party,
+    //pub party: Party, // TODO this fails now without a quest?
     // preferences
     // profile (name...)
     pub profile: Profile,
@@ -65,6 +65,8 @@ impl User {
             Ok(v) => v,
             Err(e) => fail!("json parse error: {}", e)
         };
+
+        //println!("Json: {}", obj.to_pretty_str());
 
         let mut decoder = json::Decoder::new(obj.clone());
         let user: User = match Decodable::decode(&mut decoder) {
@@ -98,7 +100,7 @@ impl User {
         }).collect()
     }
 
-    // Fetch unfinished todos as opposed to all todos.
+    //// Fetch unfinished todos as opposed to all todos.
     pub fn unfinished_todos<'a>(&'a self) -> Vec<&'a Todo> {
         self.todos.iter().filter(|t: &&Todo| {
             !t.completed

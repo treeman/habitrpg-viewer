@@ -1,7 +1,9 @@
 
+// TODO fix
 #[deriving(Show, Encodable, Decodable)]
 pub struct Quest {
-    // completed: "null" wut?
-    pub key: String,
+    // completed: May be null, or a completed quest eg "gryphon"
+    pub key: String, // May also be null
     // progess?
 }
+

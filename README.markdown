@@ -38,6 +38,8 @@ Needs
 TODO
 ====
 
+1. Fix party/quest bug.  
+    Some may be optional and/or null
 1. Filter/Mark dark dailys
 1. Colorize print conky?
 1. Party parsing for boss battle and for friends.
