@@ -13,6 +13,7 @@ pub mod daily;
 pub mod todo;
 pub mod reward;
 pub mod request;
+pub mod repeat;
 
 pub fn clean_text<'a>(text: &'a str) -> &'a str {
     let re = regex!(r"^(?::[^:]*:)?\s*(.+)");

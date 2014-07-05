@@ -1,7 +1,9 @@
 use core::fmt::{Show, Formatter, FormatError};
+use time::*;
 
 use api::date::Date;
 use api::clean_text;
+use api::repeat::Repeat;
 
 #[deriving(Encodable, Decodable)]
 pub struct Daily {
@@ -15,9 +17,25 @@ pub struct Daily {
     pub streak: uint,
     // checklist
     // collapseChecklist
-    // repeat
+    pub repeat: Repeat,
     pub completed: bool,
     //history: Vec<String>, // TODO
+}
+
+impl Daily {
+    fn due_today(&self) -> bool {
+        let t = now();
+        match t.tm_wday {
+            0 => self.repeat.su,
+            1 => self.repeat.m,
+            2 => self.repeat.t,
+            3 => self.repeat.w,
+            4 => self.repeat.th,
+            5 => self.repeat.f,
+            6 => self.repeat.s,
+            _ => fail!("Tm.tm_wday errorenous: {}", t.tm_wday),
+        }
+    }
 }
 
 impl Show for Daily {
@@ -25,7 +43,10 @@ impl Show for Daily {
         let mut s = format!("{:s} ", clean_text(self.text.as_slice()));
         if self.completed {
             s = s.append("(Done)");
-        };
+        } else if self.due_today() {
+            s = s.append("(Due today)");
+        }
+
         write!(f, "{:s}", s)
     }
 }

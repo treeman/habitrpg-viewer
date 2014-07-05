@@ -1,11 +1,12 @@
 
-#[deriving(Decodable)]
+#[deriving(Show, Encodable, Decodable)]
 pub struct Repeat  {
-    su: bool,
-    s: bool,
-    f: bool,
-    th: bool,
-    w: bool,
-    t: bool,
-    m: bool
+    pub su: bool,
+    pub m: bool,
+    pub t: bool,
+    pub w: bool,
+    pub th: bool,
+    pub f: bool,
+    pub s: bool,
 }
+
