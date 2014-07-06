@@ -140,7 +140,19 @@ fn main() {
         for t in user.dailys().iter() {
             if conky {
                 print!("${{voffset 8}}");
+
+                // Done today
+                // Due today and not done
+                // Not due today
+                if t.completed {
+                    print!("${{color #ECF0A5}}");
+                } else if t.due_today() {
+                    print!("${{color #FFFFFF}}");
+                } else {
+                    print!("${{color #808080}}");
+                }
             }
+
             println!("{}", t);
         }
     }

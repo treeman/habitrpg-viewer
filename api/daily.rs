@@ -23,7 +23,7 @@ pub struct Daily {
 }
 
 impl Daily {
-    fn due_today(&self) -> bool {
+    pub fn due_today(&self) -> bool {
         let t = now();
         match t.tm_wday {
             0 => self.repeat.su,
@@ -40,13 +40,7 @@ impl Daily {
 
 impl Show for Daily {
     fn fmt(&self, f: &mut Formatter) -> Result<(), FormatError> {
-        let mut s = format!("{:s} ", clean_text(self.text.as_slice()));
-        if self.completed {
-            s = s.append("(Done)");
-        } else if self.due_today() {
-            s = s.append("(Due today)");
-        }
-
+        let s = format!("{:s} ", clean_text(self.text.as_slice()));
         write!(f, "{:s}", s)
     }
 }

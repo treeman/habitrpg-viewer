@@ -11,8 +11,8 @@ pub struct Party {
     // name
 }
 
-#[deriving(Show, Encodable, Decodable)]
-pub struct PartyMember {
+//#[deriving(Show, Encodable, Decodable)]
+//pub struct PartyMember {
     //
     // achievements
     // items
@@ -23,5 +23,5 @@ pub struct PartyMember {
     //    timestamps
     //        created
     //        loggedin
-}
+//}
 
