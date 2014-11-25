@@ -1,4 +1,8 @@
 id.json
 tst.sh
 habit
+data
 data/*
+old
+/target
+/Cargo.lock
