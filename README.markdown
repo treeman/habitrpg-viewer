@@ -10,7 +10,7 @@ See <https://habitrpg.com/static/api#!/> for API.
 Setup
 -----
 
-Create `id.json` with
+Create `id.json` inside `~/.habitrpg-viewer` with
 
 ```
 {
