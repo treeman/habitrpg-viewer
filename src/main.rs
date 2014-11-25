@@ -40,7 +40,8 @@ fn main() {
         return;
     }
 
-    let env = Env::new();
+    let mut env = Env::new();
+    env.conky = args.opt_present("conky");
 
     if args.opt_present("todos") {
         todos(&env);
@@ -62,6 +63,9 @@ fn todos(env: &Env) {
     let user = cache::get_user(env);
 
     for t in user.unfinished_todos().iter() {
+        if env.conky {
+            print!("${{voffset 8}}");
+        }
         println!("{}", t);
     }
 }
@@ -70,6 +74,20 @@ fn dailys(env: &Env) {
     let user = cache::get_user(env);
 
     for t in user.dailys().iter() {
+        if env.conky {
+            print!("${{voffset 8}}");
+
+            // Done today
+            // Due today and not done
+            // Not due today
+            if t.completed {
+                print!("${{color #ECF0A5}}");
+            } else if t.due_today() {
+                print!("${{color #FFFFFF}}");
+            } else {
+                print!("${{color #808080}}");
+            }
+        }
         println!("{}", t);
     }
 }
@@ -78,6 +96,9 @@ fn habits(env: &Env) {
     let user = cache::get_user(env);
 
     for t in user.habits().iter() {
+        if env.conky {
+            print!("${{voffset 8}}");
+        }
         println!("{}", t);
     }
 }

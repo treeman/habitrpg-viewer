@@ -8,6 +8,7 @@ pub struct Env {
     pub configdir: Path,
     pub cachedir: Path,
     pub id: Id,
+    pub conky: bool, // TODO refactor away
 }
 
 impl Env {
@@ -30,6 +31,7 @@ impl Env {
             configdir: configdir,
             cachedir: cachedir,
             id: id,
+            conky: false,
         }
     }
 }
