@@ -4,7 +4,11 @@ name = "habitrpg-viewer"
 version = "0.0.1"
 authors = ["Jonas Hietala <mail@jonashietala.se>"]
 
-[dependencies.libhabitrpg]
+[dependencies.habitrpg]
 
 git = "https://github.com/treeman/libhabitrpg"
+
+[dependencies.time]
+
+git = "https://github.com/rust-lang/time"
 

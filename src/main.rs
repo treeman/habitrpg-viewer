@@ -1,24 +1,20 @@
 #![feature(slicing_syntax)]
 
-extern crate libhabitrpg;
+extern crate habitrpg;
 extern crate getopts;
+extern crate time;
 
 use std::{ io, os };
 use getopts::{
-    //optopt,
     optflag,
     getopts,
     usage
 };
 
-use libhabitrpg::{ Id };
-
 use env::Env;
 
 mod env;
-
-// --todos --conky
-// --dailys --conky
+mod cache;
 
 fn main() {
     let args = os::args();
@@ -63,7 +59,7 @@ fn help(progname: &str, usage: &str) {
 }
 
 fn todos(env: &Env) {
-    let user = libhabitrpg::load_user("data/user.json");
+    let user = cache::get_user(env);
 
     for t in user.unfinished_todos().iter() {
         println!("{}", t);
@@ -71,7 +67,7 @@ fn todos(env: &Env) {
 }
 
 fn dailys(env: &Env) {
-    let user = libhabitrpg::load_user("data/user.json");
+    let user = cache::get_user(env);
 
     for t in user.dailys().iter() {
         println!("{}", t);
@@ -79,7 +75,7 @@ fn dailys(env: &Env) {
 }
 
 fn habits(env: &Env) {
-    let user = libhabitrpg::load_user("data/user.json");
+    let user = cache::get_user(env);
 
     for t in user.habits().iter() {
         println!("{}", t);
@@ -87,7 +83,7 @@ fn habits(env: &Env) {
 }
 
 fn user_info(env: &Env) {
-    let user = libhabitrpg::load_user("data/user.json");
+    let user = cache::get_user(env);
 
     user.print_char();
     user.print_char_stats();

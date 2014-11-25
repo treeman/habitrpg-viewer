@@ -2,7 +2,7 @@ use std::io;
 use std::io::fs::{ mod, PathExtensions };
 use std::os;
 
-use libhabitrpg::{ mod, Id };
+use habitrpg::{ mod, Id };
 
 pub struct Env {
     pub configdir: Path,
@@ -24,7 +24,7 @@ impl Env {
         create_dir(&configdir);
         create_dir(&cachedir);
 
-        let id: Id = libhabitrpg::from_path(&configdir.join("id.json"));
+        let id: Id = habitrpg::from_path(&configdir.join("id.json"));
 
         Env {
             configdir: configdir,
@@ -41,7 +41,7 @@ fn create_dir(dir: &Path) {
     }
     if !dir.is_dir() {
         println!("Creating dir: {}", dir.display());
-        match fs::mkdir(dir, io::UserRWX) {
+        match fs::mkdir(dir, io::USER_RWX) {
             Ok(_) => (),
             Err(e) => panic!("Failed to create dir: {}", e),
         };
