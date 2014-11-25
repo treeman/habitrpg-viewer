@@ -10,14 +10,12 @@ pub fn get_user(env: &Env) -> User {
     let cachefile = env.cachedir.join("user.json");
 
     if is_old(&cachefile) {
-        println!("Updating user cache!");
         let data = habitrpg::get_user_response(&env.id);
         let user: User = habitrpg::from_str(data[]);
         // TODO if ok, save file.
         write_file(&cachefile, data[]);
         user
     } else {
-        println!("Loading user from cache");
         habitrpg::from_path(&cachefile)
     }
 }
@@ -26,7 +24,6 @@ pub fn get_party(env: &Env) -> Party {
     let cachefile = env.cachedir.join("party.json");
 
     if is_old(&cachefile) {
-        println!("Updating party cache!");
         let data = habitrpg::get_party_response(&env.id);
         let party: Party = habitrpg::from_str(data[]);
         // TODO if ok, save file.
