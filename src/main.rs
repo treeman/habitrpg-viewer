@@ -1,42 +1,36 @@
-#![feature(slicing_syntax)]
+#![feature(path_ext)]
 
 extern crate habitrpg;
-extern crate getopts;
 extern crate time;
+extern crate getopts;
 
-use std::{ io, os };
-use getopts::{
-    optflag,
-    getopts,
-    usage
-};
-
+use getopts::Options;
 use env::Env;
 
 mod env;
 mod cache;
 
 fn main() {
-    let args = os::args();
-
-    let opts = [
-        optflag("h", "help", "Display this helpful message"),
-        optflag("", "todos", "Output unfinished todos"),
-        optflag("", "dailys", "Output dailys"),
-        optflag("", "habits", "Output habits"),
-        optflag("", "conky", "Add format specifiers for conky display. Harr."),
-    ];
-
+    let args: Vec<String> = std::env::args().collect();
     let progname = args[0].clone();
-    let usage = usage("View info from habitrpg.", &opts);
 
-    let args = match getopts(args.tail(), &opts) {
+    let mut opts = Options::new();
+    opts.optflag("h", "help", "Display this helpful message");
+    opts.optflag("", "todos", "Output unfinished todos");
+    opts.optflag("", "dailys", "Output dailys");
+    opts.optflag("", "habits", "Output habits");
+    opts.optflag("", "conky", "Add format specifiers for conky display. Harr.");
+
+    opts.usage("View info from habitrpg.");
+
+    let args = match opts.parse(&args[1..]) {
         Ok(x) => x,
         Err(e) => panic!("{}", e),
     };
 
     if args.opt_present("h") {
-        help(progname[], usage[]);
+        let brief = format!("Usage: {} [options]", progname);
+        print!("{}", opts.usage(&brief));
         return;
     }
 
@@ -54,11 +48,6 @@ fn main() {
     }
 }
 
-fn help(progname: &str, usage: &str) {
-    println!("Usage: {} [OPTION]", progname);
-    io::println(usage);
-}
-
 fn todos(env: &Env) {
     let user = cache::get_user(env);
 
@@ -66,7 +55,7 @@ fn todos(env: &Env) {
         if env.conky {
             print!("${{voffset 8}}");
         }
-        println!("{}", t);
+        println!("{:?}", t);
     }
 }
 
@@ -117,7 +106,7 @@ fn user_info(env: &Env) {
     }
     println!("\nTodos\n-----");
     for t in user.unfinished_todos().iter() {
-        println!("{}", t);
+        println!("{:?}", t);
     }
 }
 

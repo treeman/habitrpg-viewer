@@ -1,12 +1,15 @@
-use std::io;
-use std::io::fs::{ mod, PathExtensions };
-use std::os;
+use std::path::{ Path, PathBuf };
+use std::fs::PathExt;
+//use std::os::unix::fs::*;
+use std::fs;
+use std::env;
 
-use habitrpg::{ mod, Id };
+use habitrpg;
+use habitrpg::{ Id };
 
 pub struct Env {
-    pub configdir: Path,
-    pub cachedir: Path,
+    pub configdir: PathBuf,
+    pub cachedir: PathBuf,
     pub id: Id,
     pub conky: bool, // TODO refactor away
 }
@@ -14,7 +17,7 @@ pub struct Env {
 impl Env {
     /// Config directory defaults to ~/.habitrpg-viewer
     pub fn new() -> Env {
-        let homedir = match os::homedir() {
+        let homedir = match env::home_dir() {
             Some(d) => d,
             None => panic!("Could not find your homedir!"),
         };
@@ -43,10 +46,10 @@ fn create_dir(dir: &Path) {
     }
     if !dir.is_dir() {
         println!("Creating dir: {}", dir.display());
-        match fs::mkdir(dir, io::USER_RWX) {
-            Ok(_) => (),
-            Err(e) => panic!("Failed to create dir: {}", e),
-        };
+        match fs::create_dir_all(dir) {
+            Ok(_) => {},
+            Err(e) => panic!("Failed to create dir {}: {}", dir.display(), e),
+        }
     }
 }
 
